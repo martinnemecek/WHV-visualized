@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMZ on Google Maps with Toggle and Labels</title>
+    <style>
+        #map {
+            height: 90vh;
+            width: 100%;
+        }
+
+        #controls {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-button {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .labels-container {
+            margin-top: 10px;
+        }
+
+        .map-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            padding: 5px;
+            border: 1px solid #000;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button class="toggle-button">Toggle All Layers</button>
+        <div class="labels-container">
+            <div class="map-label"><div class="color-box" style="background-color: #808080;"></div>417 & 462 tourism and hospitality</div>
+            <div class="map-label"><div class="color-box" style="background-color: #0000FF;"></div>417 all specified work 462 plant and animal cultivation, construction</div>
+            <div class="map-label"><div class="color-box" style="background-color: #00FF00;"></div>417 all specified work 462 tourism, hospitality, plant and animal cultivation, construction</div>
+            <div class="map-label"><div class="color-box" style="background-color: #FFA500;"></div>417 all specified work 462 tourism, hospitality, plant and animal cultivation, forestry, fishing and construction</div>
+        </div>
+    </div>
+    <div id="map"></div>
+
+    <script src="config.js"></script>
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8
+            });
+
+           /*  const kmlLayerUrls = [
+                { url: 'https://drive.google.com/uc?export=download&id=1iv3pZVW8JoqnIEdIcFIMYYR39KDNz12i', name: 'Layer 1' },
+                { url: 'https://drive.google.com/uc?export=download&id=1AYIk1xLuYwm17EduM-Qr_qd2dgWlFs7n', name: 'Layer 8a' },
+                { url: 'https://drive.google.com/uc?export=download&id=12p1EfhB84M3KwQPOGl2ZQ8IHVZtY6P_M', name: 'Layer 8b' },
+                { url: 'https://drive.google.com/uc?export=download&id=1FuNd1eyulm-Xnhdme7qVoCut_QDdJtMs', name: 'Layer 8c' },
+                { url: 'https://drive.google.com/uc?export=download&id=1d3hPvR1-cVX4H7n9Kn6Gtj6Aka561tRJ', name: 'Layer 9' },
+                { url: 'https://drive.google.com/uc?export=download&id=1-x9qaIoxOFR5eyWfx-bsoh8Ufiz-3RSn', name: 'Layer 10' },
+                { url: 'https://drive.google.com/uc?export=download&id=1Kaq-L9mIOeTUxLoHbpyw6GfxU_E6Ldp6', name: 'Layer 12' },
+                { url: 'https://drive.google.com/uc?export=download&id=1CS94mZ9JsszIHieRQU3B_xClFghONd0m', name: 'Layer 13' }
+            ]; */
+
+            /* const kmlLayerUrls = [
+                { url: './POA/1.kmz', name: 'Layer 1' },
+                { url: './POA/8a.kmz', name: 'Layer 8a' },
+                { url: './POA/8b.kmz', name: 'Layer 8b' },
+                { url: './POA/8c.kmz', name: 'Layer 8c' },
+                { url: './POA/9.kmz', name: 'Layer 9' },
+                { url: './POA/10.kmz', name: 'Layer 10' },
+                { url: './POA/12.kmz', name: 'Layer 12' },
+                { url: './POA/13.kmz', name: 'Layer 13' }
+            ]; */
+
+            const kmlLayerUrls = [
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/1.kmz', name: 'Layer 1' },
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/8a.kmz', name: 'Layer 8a' },
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/8b.kmz', name: 'Layer 8b' },
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/8c.kmz', name: 'Layer 8c' },
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/9.kmz', name: 'Layer 9' },
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/10.kmz', name: 'Layer 10' },
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/12.kmz', name: 'Layer 12' },
+                { url: 'https://42f9-14-200-147-26.ngrok-free.app/POA/13.kmz', name: 'Layer 13' }
+            ];
+
+
+            const layers = [];
+
+            // Create KML layers and add to map
+            kmlLayerUrls.forEach(layerData => {
+                const kmlLayer = new google.maps.KmlLayer({
+                    url: layerData.url,
+                    map: null, // Initially not visible
+                    preserveViewport: true
+                });
+
+                // Store the layer reference
+                layers.push(kmlLayer);
+            });
+
+            // Toggle button to show/hide all layers
+            const button = document.querySelector('.toggle-button');
+            let layersVisible = false; // Track the visibility state of layers
+            button.onclick = () => {
+                layersVisible = !layersVisible;
+                layers.forEach(layer => {
+                    layer.setMap(layersVisible ? map : null);
+                });
+                button.innerText = layersVisible ? 'Hide All Layers' : 'Show All Layers';
+            };
+        }
+
+            // Load the Google Maps API
+            function loadGoogleMapsAPI() {
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap`;
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+        }
+
+        loadGoogleMapsAPI();
+    </script>
+</body>
+</html>
